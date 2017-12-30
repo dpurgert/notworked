@@ -41,7 +41,9 @@ t2=$(mktemp /tmp/notwork.XXXXX)
 if [[ $EUID -ne 0 ]] ;then
   printf "not running as root, arp table will not be printed.\n"
 else
-  arp >$t2 2>&1
+  printf "ARP Table:\n"
+  arp |tee $t2 2>&1
+  printf "\n\n"
 fi
 
 
@@ -55,9 +57,10 @@ elif [[ $1 = "-a" ]]; then
   ( printf "Routing table:\n"
     ip route
     printf "\n\nInterface addresses:\n"
-    ip addr) >$t1 2>&1
+    ip addr
+    printf "\n\n") >$t1 2>&1
   
-  cat <$t1
+  cat $t1 $t2 | nc termbin.com 9999
 fi
 
 rm $t1 $t2
